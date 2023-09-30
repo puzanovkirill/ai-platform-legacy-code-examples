@@ -1,0 +1,6 @@
+# this script is used to uncommend Google Tag Manager scripts in the index.html
+# usage example: sed -f uncomment_gtm_script_file.txt index.html
+s/<!-- GTM_HEAD_START//
+s/GTM_HEAD_END -->//
+s/<!-- GTM_BODY_START//
+s/GTM_BODY_END -->//

@@ -1,0 +1,46 @@
+workflow:
+  rules:
+    - if: $CI_COMMIT_BRANCH
+    - if: $CI_COMMIT_TAG
+    - if: $CI_COMMIT_BRANCH && $CI_OPEN_MERGE_REQUESTS
+      when: never
+
+stages:
+  - eslint
+  - build
+
+variables:
+  AI_FOLDER: 'ai-platform'
+
+ai-eslint:
+  stage: eslint
+  image: node:16-alpine
+  variables:
+    CURRENT_PROJECT_FOLDER_NAME: "$AI_FOLDER"
+  before_script:
+    - npm i
+  script:
+    - npm run eslint
+  allow_failure: false
+  rules:
+    - when: always
+
+ai-build:
+  stage: build
+  image: node:16-alpine
+  before_script:
+    - apk update
+    - apk add bash
+    - npm i
+  variables:
+    CURRENT_PROJECT_FOLDER_NAME: "$AI_FOLDER"
+  script:
+    - CI=false npm run build
+    - cd build
+  needs:
+    - job: ai-eslint
+  when: manual
+  artifacts:
+    paths:
+      - 'build'
+    expire_in: 1 day
